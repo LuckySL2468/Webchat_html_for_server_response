@@ -1,4 +1,4 @@
-//This contains the basic webchat html code with adding a string in front of the input and the response. This also aligns the response to the right side of the window while having the user input on the left
+//This contains the basic webchat html code with adding a string in front of the input and the response. The string is in bold letters. This also aligns the response to the right side of the window while having the user input on the left
 
 <!DOCTYPE html>
 <html>
