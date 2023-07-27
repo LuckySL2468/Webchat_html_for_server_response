@@ -1,0 +1,80 @@
+//This contains the basic webchat html code with adding a string in front of the input and the response. The string value is in bold
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Interface</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input">
+      <input type="text" id="message-input" placeholder="Talk to our AI Assistant">
+      <button id="send-button">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const chatMessages = document.getElementById('chat-messages');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+
+    // Function to append a message to the chat messages container with a custom prefix
+    function appendMessage(message, sender, customPrefix = '') {
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+      messageElement.classList.add(sender);
+
+      // Make the custom prefix bold using <strong> tags
+      const prefixElement = document.createElement('strong');
+      prefixElement.innerText = customPrefix;
+
+      // Combine the prefix and the message
+      messageElement.appendChild(prefixElement);
+      messageElement.innerHTML += ' ' + message;
+
+      chatMessages.appendChild(messageElement);
+    }
+
+    // Function to send a message to the server
+    async function sendMessageToServer(message) {
+      const response = await fetch('https://bizzman-wix-website-chatbot.lakshithachandr.repl.co/api/message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await response.json();
+      return data.message;
+    }
+
+    // Event listener for send button click
+    sendButton.addEventListener('click', async () => {
+      const message = messageInput.value.trim();
+      if (message !== '') {
+        // Append the user's message with the custom prefix "You:"
+        appendMessage(message, 'user', 'You:');
+
+        // Send the message to the server and get the response
+        const response = await sendMessageToServer(message);
+
+        // Append the response with the custom prefix "Response:"
+        appendMessage(response, 'bot', 'Response:');
+
+        // Clear the input field
+        messageInput.value = '';
+      }
+    });
+
+    // Event listener for Enter key press in the input field
+    messageInput.addEventListener('keypress', async (event) => {
+      if (event.key === 'Enter') {
+        sendButton.click();
+      }
+    });
+  </script>
+</body>
+</html>
