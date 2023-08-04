@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Chat Interface</title>
+  <style>
+    /* Add your CSS styles here */
+    /* Set the background color of the chat container to white */
+    .chat-container {
+      background-color: black;
+      font-family: 'Heebo Light', sans-serif; /* Set the font for the entire chat container */
+      /* Add more styling for the chat container if needed */
+      /* For example, you can set its width, height, margins, etc. */
+    }
+    
+    /* Set the text color for user input and bot response to white */
+    .user {
+      color: white;
+      margin-bottom: 3px; /* Add spacing between user input and bot response */
+      /* Add more styling for the user and bot messages if needed */
+      /* For example, you can set font size, font family, etc. */
+    }
+    
+    /* Set the text color for user input and bot response to white */
+    .user, .bot {
+      color: white;
+      /* Add more styling for the user and bot messages if needed */
+      /* For example, you can set font size, font family, etc. */
+    }
+    
+    /* Flatter, modern design for the "Send" button */
+    #send-button {
+      background-color: #007BFF; /* Set the background color to a blue shade */
+      color: white; /* Set the text color to white */
+      border: none; /* Remove border */
+      padding: 8px 16px; /* Add padding to make it visually larger */
+      border-radius: 4px; /* Add rounded corners */
+      cursor: pointer; /* Show a pointer cursor on hover */
+    }
+
+    /* Flatter, modern design for the chat input text field */
+    #message-input {
+      border: 1px solid #007BFF; /* Add a blue border */
+      padding: 8px 16px; /* Add padding to make it visually larger */
+      border-radius: 4px; /* Add rounded corners */
+      color: white; /* Set the text color to white */
+      background-color: transparent; /* Make the background transparent */
+      width: 100%; /* Set the width to fill the container */
+      font-family: 'Heebo Light', sans-serif; /* Set the font for the entire chat container */
+    }
+    
+    /* Set the text color for the bot response to #34e8eb */
+    .bot {
+      color: #34e8eb;
+      margin-bottom: 13px; /* Add spacing between user input and bot response */
+    }
+    
+        /* Add styles for the preformatted bot response */
+    .bot pre {
+      white-space: pre-wrap; /* Preserve line breaks and spacing in <pre> tag */
+      margin: 0; /* Remove default margin for <pre> tag */
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input">
+      <input type="text" id="message-input" placeholder="Talk to our AI Assistant">
+      <button id="send-button">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const chatMessages = document.getElementById('chat-messages');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+
+    // Function to append a message to the chat messages container with a custom prefix
+    function appendMessage(message, sender, customPrefix = '') {
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+      messageElement.classList.add(sender);
+
+      // Make the custom prefix bold using <strong> tags
+      const prefixElement = document.createElement('strong');
+      prefixElement.innerText = customPrefix;
+
+      // Combine the prefix and the message
+      messageElement.appendChild(prefixElement);
+      messageElement.innerHTML += ' ' + message;
+
+      chatMessages.appendChild(messageElement);
+    }
+
+    // Function to send a message to the server
+    async function sendMessageToServer(message) {
+      const response = await fetch('https://bizzman-wix-website-chatbot.lakshithachandr.repl.co/api/message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await response.json();
+      return data.message;
+    }
+
+    // Event listener for send button click
+    sendButton.addEventListener('click', async () => {
+      const message = messageInput.value.trim();
+      if (message !== '') {
+        // Append the user's message with the custom prefix "You:"
+        appendMessage(message, 'user', 'You:');
+
+        // Send the message to the server and get the response
+        const response = await sendMessageToServer(message);
+
+        // Append the response with the custom prefix "Response:"
+        appendMessage(response, 'bot', 'Response:');
+
+        // Clear the input field
+        messageInput.value = '';
+      }
+    });
+
+    // Event listener for Enter key press in the input field
+    messageInput.addEventListener('keypress', async (event) => {
+      if (event.key === 'Enter') {
+        sendButton.click();
+      }
+    });
+  </script>
+</body>
+</html>
